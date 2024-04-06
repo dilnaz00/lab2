@@ -26,14 +26,14 @@ class CatListAdapter : ListAdapter<Data, CatListAdapter.ViewHolder>(CatDiffUtil(
         dataList = list ?: listOf()
     }
 
-    fun filter(query: String?) {
-        val filteredList = if (query.isNullOrBlank()) {
-            dataList
-        } else {
-            dataList.filter { it.name.contains(query, ignoreCase = true) }
-        }
-        submitList(filteredList)
-    }
+//    fun filter(query: String?) {
+//        val filteredList = if (query.isNullOrBlank()) {
+//            currentList // Use the ListAdapter's internal list directly
+//        } else {
+//            currentList.filter { it.name.contains(query, ignoreCase = true) }
+//        }
+//        submitList(filteredList) // Let DiffUtil take care of the rest
+//    }
 
     inner class ViewHolder(private val binding: ItemCatBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Data) {

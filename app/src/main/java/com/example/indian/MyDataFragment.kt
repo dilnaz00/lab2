@@ -1,4 +1,3 @@
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +19,8 @@ class MyDataFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var adapter: CatListAdapter
+    private var dataList: List<Data> = listOf()
+    private var filteredList: List<Data> = listOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,7 +43,8 @@ class MyDataFragment : Fragment() {
         ApiClient.instance.fetchOfferList().enqueue(object : Callback<List<Data>> {
             override fun onResponse(call: Call<List<Data>>, response: Response<List<Data>>) {
                 if (response.isSuccessful && response.body() != null) {
-                    adapter.submitList(response.body())
+                    dataList = response.body() ?: listOf()
+                    filterList("") // Initially display full list
                 } else {
                     // Handle unsuccessful response
                 }
@@ -56,14 +58,12 @@ class MyDataFragment : Fragment() {
         // Implement Search functionality
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                // Handle search query submission
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Filter the list based on the search query
-                adapter.filter(newText)
-                return false
+                filterList(newText.orEmpty())
+                return true
             }
         })
     }
@@ -71,6 +71,15 @@ class MyDataFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun filterList(query: String) {
+        filteredList = if (query.isBlank()) {
+            dataList // Display full list if query is empty or blank
+        } else {
+            dataList.filter { it.name.contains(query, ignoreCase = true) }
+        }
+        adapter.submitList(filteredList)
     }
 
     companion object {
